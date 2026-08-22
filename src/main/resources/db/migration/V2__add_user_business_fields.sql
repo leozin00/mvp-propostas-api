@@ -1,0 +1,3 @@
+ALTER TABLE users ADD COLUMN company_name VARCHAR(255);
+ALTER TABLE users ADD COLUMN contact_email VARCHAR(255);
+ALTER TABLE users ADD COLUMN contact_phone VARCHAR(50);
