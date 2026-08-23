@@ -55,6 +55,45 @@ Copie `.env.example` (na raiz do monorepo) e ajuste se necessário. Valores padr
 | `DB_PASSWORD` | `mvp` |
 | `SERVER_PORT` | `8080` |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:4200` |
+| `SENTRY_DSN` | DSN do projeto `mvp-propostas-api` no Sentry |
+| `SENTRY_ENVIRONMENT` | `development` |
+| `SENTRY_TRACES_SAMPLE_RATE` | `1.0` |
+| `APP_DEBUG_SENTRY_TEST_ENABLED` | `true` — habilita `GET /api/v1/debug/sentry` para testar integração |
+
+> O Spring Boot carrega automaticamente o arquivo `.env` da raiz do monorepo (ou `backend/.env`).
+
+### Erros no frontend vs backend
+
+| Cenário | Quem captura no Sentry |
+|---------|------------------------|
+| Docker/Postgres desligado e **backend fora do ar** | **Frontend** (`javascript-angular`) — a requisição nem chega ao Java |
+| Docker/Postgres desligado e **backend no ar** | **Backend** (`mvp-propostas-api`) — a API responde 500 e envia o erro |
+| `GET /api/v1/debug/sentry` | **Backend** — erro forçado para teste |
+
+## Sentry
+
+Monitoramento de erros configurado com a conta pessoal de desenvolvimento:
+
+| App | Projeto Sentry |
+|-----|----------------|
+| Frontend (Angular) | `javascript-angular` |
+| Backend (API) | `mvp-propostas-api` |
+
+### Testar integração
+
+**Backend** — com `APP_DEBUG_SENTRY_TEST_ENABLED=true`:
+
+```bash
+curl http://localhost:8080/api/v1/debug/sentry
+```
+
+**Frontend** — no console do navegador:
+
+```javascript
+throw new Error('Sentry test error from MVP Propostas frontend');
+```
+
+Os eventos aparecem em [sentry.io](https://sentry.io) nos projetos acima.
 
 ## Estrutura de pacotes
 

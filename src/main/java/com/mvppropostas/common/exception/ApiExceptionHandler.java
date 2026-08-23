@@ -3,12 +3,18 @@ package com.mvppropostas.common.exception;
 import java.time.Instant;
 import java.util.Map;
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import io.sentry.Sentry;
+
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
@@ -37,6 +43,29 @@ public class ApiExceptionHandler {
                 "timestamp", Instant.now().toString(),
                 "status", HttpStatus.BAD_REQUEST.value(),
                 "error", "Validation Error",
+                "message", message));
+  }
+
+  @ExceptionHandler(DataAccessException.class)
+  ResponseEntity<Map<String, Object>> handleDataAccess(DataAccessException exception) {
+    return buildServerError(exception, "Falha ao acessar o banco de dados.");
+  }
+
+  @ExceptionHandler(Exception.class)
+  ResponseEntity<Map<String, Object>> handleUnexpected(Exception exception) {
+    return buildServerError(exception, "Ocorreu um erro inesperado.");
+  }
+
+  private ResponseEntity<Map<String, Object>> buildServerError(
+      Exception exception, String message) {
+    Sentry.captureException(exception);
+
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(
+            Map.of(
+                "timestamp", Instant.now().toString(),
+                "status", HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "error", "Internal Server Error",
                 "message", message));
   }
 }
