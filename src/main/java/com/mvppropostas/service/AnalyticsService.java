@@ -125,28 +125,28 @@ public class AnalyticsService {
   private List<MonthlyApprovedResponse> buildMonthlyApproved(UUID userId) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
 
-    Map<String, MonthlyAccumulator> grouped =
+    Map<String, List<Proposal>> grouped =
         proposalRepository.findApprovedByUserId(userId).stream()
-            .collect(
-                Collectors.groupingBy(
-                    proposal -> proposal.getApprovedAt().format(formatter),
-                    Collectors.collectingAndThen(
-                        Collectors.toList(),
-                        proposals -> {
-                          BigDecimal value =
-                              proposals.stream()
-                                  .map(Proposal::getTotal)
-                                  .reduce(BigDecimal.ZERO, BigDecimal::add);
-                          return new MonthlyAccumulator(value, proposals.size());
-                        })));
+            .collect(Collectors.groupingBy(proposal -> proposal.getApprovedAt().format(formatter)));
 
     return grouped.entrySet().stream()
-        .sorted(Map.Entry.<String, MonthlyAccumulator>comparingByKey().reversed())
+        .sorted(Map.Entry.<String, List<Proposal>>comparingByKey().reversed())
         .limit(6)
         .map(
-            entry ->
-                new MonthlyApprovedResponse(
-                    entry.getKey(), entry.getValue().value(), entry.getValue().count()))
+            entry -> {
+              List<Proposal> proposals = entry.getValue();
+              BigDecimal value =
+                  proposals.stream()
+                      .map(Proposal::getTotal)
+                      .reduce(BigDecimal.ZERO, BigDecimal::add);
+              List<RecentProposalResponse> proposalResponses =
+                  proposals.stream()
+                      .sorted(Comparator.comparing(Proposal::getApprovedAt).reversed())
+                      .map(this::toRecentProposal)
+                      .toList();
+              return new MonthlyApprovedResponse(
+                  entry.getKey(), value, proposals.size(), proposalResponses);
+            })
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
@@ -159,6 +159,4 @@ public class AnalyticsService {
         proposal.getStatus(),
         proposal.getValidUntil());
   }
-
-  private record MonthlyAccumulator(BigDecimal value, long count) {}
 }
