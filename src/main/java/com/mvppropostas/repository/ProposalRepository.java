@@ -72,4 +72,14 @@ public interface ProposalRepository extends JpaRepository<Proposal, UUID> {
       ORDER BY p.approvedAt DESC
       """)
   List<Proposal> findApprovedByUserId(@Param("userId") UUID userId);
+
+  @Query(
+      """
+      SELECT p
+      FROM Proposal p
+      JOIN FETCH p.client
+      WHERE p.userId = :userId
+        AND p.deletedAt IS NULL
+      """)
+  List<Proposal> findAllByUserIdWithClient(@Param("userId") UUID userId);
 }

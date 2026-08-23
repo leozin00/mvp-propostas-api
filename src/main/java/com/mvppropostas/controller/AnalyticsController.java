@@ -1,11 +1,14 @@
 package com.mvppropostas.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mvppropostas.dto.response.DashboardResponse;
 import com.mvppropostas.dto.response.ProfileAnalyticsResponse;
+import com.mvppropostas.dto.response.ProposalStatusNotificationResponse;
 import com.mvppropostas.service.AnalyticsService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,5 +28,10 @@ public class AnalyticsController {
   @GetMapping("/profile")
   ProfileAnalyticsResponse getProfileAnalytics() {
     return analyticsService.getProfileAnalytics();
+  }
+
+  @GetMapping("/notifications")
+  List<ProposalStatusNotificationResponse> getStatusNotifications() {
+    return analyticsService.getStatusNotifications();
   }
 }

@@ -2,6 +2,7 @@ package com.mvppropostas.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import com.mvppropostas.dto.response.DashboardResponse;
 import com.mvppropostas.dto.response.MonthlyApprovedResponse;
 import com.mvppropostas.dto.response.ProfileAnalyticsResponse;
 import com.mvppropostas.dto.response.ProfileAnalyticsSummaryResponse;
+import com.mvppropostas.dto.response.ProposalStatusNotificationResponse;
 import com.mvppropostas.dto.response.RecentProposalResponse;
 import com.mvppropostas.dto.response.StatusCountResponse;
 import com.mvppropostas.repository.ClientRepository;
@@ -74,6 +76,10 @@ public class AnalyticsService {
             .toList();
 
     return new DashboardResponse(metrics, recentProposals);
+  }
+
+  public List<ProposalStatusNotificationResponse> getStatusNotifications() {
+    return buildStatusNotifications(currentUserProvider.getCurrentUserId());
   }
 
   public ProfileAnalyticsResponse getProfileAnalytics() {
@@ -148,6 +154,40 @@ public class AnalyticsService {
                   entry.getKey(), value, proposals.size(), proposalResponses);
             })
         .collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  private List<ProposalStatusNotificationResponse> buildStatusNotifications(UUID userId) {
+    List<ProposalStatusNotificationResponse> notifications = new ArrayList<>();
+
+    for (Proposal proposal : proposalRepository.findAllByUserIdWithClient(userId)) {
+      addStatusNotification(notifications, proposal, ProposalStatus.SENT, proposal.getSentAt());
+      addStatusNotification(notifications, proposal, ProposalStatus.VIEWED, proposal.getViewedAt());
+      addStatusNotification(notifications, proposal, ProposalStatus.APPROVED, proposal.getApprovedAt());
+      addStatusNotification(notifications, proposal, ProposalStatus.REJECTED, proposal.getRejectedAt());
+    }
+
+    return notifications.stream()
+        .sorted(Comparator.comparing(ProposalStatusNotificationResponse::occurredAt).reversed())
+        .limit(8)
+        .toList();
+  }
+
+  private void addStatusNotification(
+      List<ProposalStatusNotificationResponse> notifications,
+      Proposal proposal,
+      ProposalStatus status,
+      LocalDateTime occurredAt) {
+    if (occurredAt == null) {
+      return;
+    }
+
+    notifications.add(
+        new ProposalStatusNotificationResponse(
+            proposal.getId(),
+            proposal.getClient().getName(),
+            proposal.getTitle(),
+            status,
+            occurredAt));
   }
 
   private RecentProposalResponse toRecentProposal(Proposal proposal) {
