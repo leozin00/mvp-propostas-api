@@ -82,4 +82,54 @@ public interface ProposalRepository extends JpaRepository<Proposal, UUID> {
         AND p.deletedAt IS NULL
       """)
   List<Proposal> findAllByUserIdWithClient(@Param("userId") UUID userId);
+
+  @Query(
+      """
+      SELECT p
+      FROM Proposal p
+      JOIN FETCH p.client
+      WHERE p.userId = :userId
+        AND p.deletedAt IS NULL
+      ORDER BY p.updatedAt DESC
+      """)
+  List<Proposal> findVisibleByUserId(@Param("userId") UUID userId);
+
+  @Query(
+      """
+      SELECT p
+      FROM Proposal p
+      JOIN FETCH p.client
+      WHERE p.userId = :userId
+        AND p.clientId = :clientId
+        AND p.deletedAt IS NULL
+      ORDER BY p.updatedAt DESC
+      """)
+  List<Proposal> findVisibleByUserIdAndClientId(
+      @Param("userId") UUID userId, @Param("clientId") UUID clientId);
+
+  @Query(
+      """
+      SELECT p
+      FROM Proposal p
+      JOIN FETCH p.client
+      LEFT JOIN FETCH p.items
+      WHERE p.id = :id
+        AND p.userId = :userId
+        AND p.deletedAt IS NULL
+      """)
+  Optional<Proposal> findVisibleByIdAndUserId(@Param("id") UUID id, @Param("userId") UUID userId);
+
+  boolean existsByClientIdAndDeletedAtIsNull(UUID clientId);
+
+  long countByClientIdAndDeletedAtIsNull(UUID clientId);
+
+  @Query(
+      """
+      SELECT p.clientId, COUNT(p)
+      FROM Proposal p
+      WHERE p.userId = :userId
+        AND p.deletedAt IS NULL
+      GROUP BY p.clientId
+      """)
+  List<Object[]> countVisibleByClientForUser(@Param("userId") UUID userId);
 }

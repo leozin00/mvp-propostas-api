@@ -18,6 +18,17 @@ import io.sentry.Sentry;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
+  @ExceptionHandler(ResourceNotFoundException.class)
+  ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException exception) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(
+            Map.of(
+                "timestamp", Instant.now().toString(),
+                "status", HttpStatus.NOT_FOUND.value(),
+                "error", "Not Found",
+                "message", exception.getMessage()));
+  }
+
   @ExceptionHandler(BusinessException.class)
   ResponseEntity<Map<String, Object>> handleBusiness(BusinessException exception) {
     return ResponseEntity.badRequest()
