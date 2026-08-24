@@ -8,6 +8,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,6 +18,32 @@ import io.sentry.Sentry;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+  @ExceptionHandler(UnauthorizedException.class)
+  ResponseEntity<Map<String, Object>> handleUnauthorized(UnauthorizedException exception) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body(
+            Map.of(
+                "timestamp", Instant.now().toString(),
+                "status", HttpStatus.UNAUTHORIZED.value(),
+                "error", "Unauthorized",
+                "message", exception.getMessage()));
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException exception) {
+    String message =
+        exception.getMessage() == null || exception.getMessage().isBlank()
+            ? "Acesso negado."
+            : exception.getMessage();
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(
+            Map.of(
+                "timestamp", Instant.now().toString(),
+                "status", HttpStatus.FORBIDDEN.value(),
+                "error", "Forbidden",
+                "message", message));
+  }
 
   @ExceptionHandler(ResourceNotFoundException.class)
   ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException exception) {

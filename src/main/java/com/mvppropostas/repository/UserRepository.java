@@ -10,4 +10,6 @@ import com.mvppropostas.domain.entity.User;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
   Optional<User> findByEmailIgnoreCase(String email);
+
+  Optional<User> findByFirebaseUid(String firebaseUid);
 }

@@ -28,7 +28,10 @@ public class User {
   @Column(nullable = false, unique = true)
   private String email;
 
-  @Column(name = "password_hash", nullable = false)
+  @Column(name = "firebase_uid", unique = true)
+  private String firebaseUid;
+
+  @Column(name = "password_hash")
   private String passwordHash;
 
   @Enumerated(EnumType.STRING)
