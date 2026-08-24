@@ -132,4 +132,16 @@ public interface ProposalRepository extends JpaRepository<Proposal, UUID> {
       GROUP BY p.clientId
       """)
   List<Object[]> countVisibleByClientForUser(@Param("userId") UUID userId);
+
+  @Query(
+      """
+      SELECT p
+      FROM Proposal p
+      JOIN FETCH p.client
+      LEFT JOIN FETCH p.items
+      WHERE p.publicToken = :token
+        AND p.deletedAt IS NULL
+        AND p.status <> com.mvppropostas.domain.enums.ProposalStatus.DRAFT
+      """)
+  Optional<Proposal> findPublishedByPublicToken(@Param("token") String token);
 }

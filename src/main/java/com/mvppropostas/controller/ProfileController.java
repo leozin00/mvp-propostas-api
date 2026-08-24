@@ -1,12 +1,17 @@
 package com.mvppropostas.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mvppropostas.dto.request.ProfileBusinessRequest;
+import com.mvppropostas.dto.request.ProfilePersonalRequest;
 import com.mvppropostas.dto.response.UserProfileResponse;
 import com.mvppropostas.service.ProfileService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -19,5 +24,15 @@ public class ProfileController {
   @GetMapping
   UserProfileResponse getProfile() {
     return profileService.getProfile();
+  }
+
+  @PutMapping("/personal")
+  UserProfileResponse updatePersonal(@Valid @RequestBody ProfilePersonalRequest request) {
+    return profileService.updatePersonal(request);
+  }
+
+  @PutMapping("/business")
+  UserProfileResponse updateBusiness(@Valid @RequestBody ProfileBusinessRequest request) {
+    return profileService.updateBusiness(request);
   }
 }
