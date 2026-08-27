@@ -42,6 +42,8 @@ public class SecurityConfig {
                         "/actuator/info",
                         "/api/v1/health",
                         "/api/v1/public/**",
+                        "/api/v1/webhooks/mercadopago",
+                        "/api/v1/dev/mercadopago/oauth/**",
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html")

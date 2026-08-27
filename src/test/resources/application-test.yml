@@ -21,6 +21,18 @@ app:
     allowed-origins: http://localhost:4200,http://127.0.0.1:4200
   firebase:
     project-id: test-project
+  mercadopago:
+    access-token: test-access-token
+    sandbox-access-token: ""
+    application-id: ""
+    client-secret: ""
+    oauth-redirect-uri: http://localhost:8080/api/v1/dev/mercadopago/oauth/callback
+    webhook-secret: ""
+    pro-plan-id: ""
+    back-url: https://www.mercadopago.com.br
+    test-payer-email: ""
+    test-payer-user-id: ""
+    api-base-url: https://api.mercadopago.com
 
 sentry:
   dsn: ""

@@ -41,6 +41,18 @@ app:
     project-id: ${FIREBASE_PROJECT_ID:gestao-propostas-mvp}
   debug:
     sentry-test-enabled: ${APP_DEBUG_SENTRY_TEST_ENABLED:true}
+  mercadopago:
+    access-token: ${MERCADOPAGO_ACCESS_TOKEN:}
+    sandbox-access-token: ${MERCADOPAGO_SANDBOX_ACCESS_TOKEN:}
+    application-id: ${MERCADOPAGO_APPLICATION_ID:}
+    client-secret: ${MERCADOPAGO_CLIENT_SECRET:}
+    oauth-redirect-uri: ${MERCADOPAGO_OAUTH_REDIRECT_URI:http://localhost:8080/api/v1/dev/mercadopago/oauth/callback}
+    webhook-secret: ${MERCADOPAGO_WEBHOOK_SECRET:}
+    pro-plan-id: ${MERCADOPAGO_PRO_PLAN_ID:}
+    back-url: ${MERCADOPAGO_BACK_URL:https://www.mercadopago.com.br}
+    test-payer-email: ${MERCADOPAGO_TEST_PAYER_EMAIL:}
+    test-payer-user-id: ${MERCADOPAGO_TEST_PAYER_USER_ID:}
+    api-base-url: ${MERCADOPAGO_API_BASE_URL:https://api.mercadopago.com}
 
 sentry:
   dsn: ${SENTRY_DSN:https://419cfa37be287d043be5e6014e36a626@o4504449191313408.ingest.us.sentry.io/4511957041414144}

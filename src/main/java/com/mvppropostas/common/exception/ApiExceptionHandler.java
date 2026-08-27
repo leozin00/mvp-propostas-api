@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import io.sentry.Sentry;
+import lombok.extern.slf4j.Slf4j;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
+@Slf4j
 public class ApiExceptionHandler {
 
   @ExceptionHandler(UnauthorizedException.class)
@@ -96,6 +98,7 @@ public class ApiExceptionHandler {
 
   private ResponseEntity<Map<String, Object>> buildServerError(
       Exception exception, String message) {
+    log.error(message, exception);
     Sentry.captureException(exception);
 
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
