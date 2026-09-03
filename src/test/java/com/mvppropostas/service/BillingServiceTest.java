@@ -34,6 +34,7 @@ class BillingServiceTest {
   @Mock private MercadoPagoClient mercadoPagoClient;
   @Mock private SubscriptionRepository subscriptionRepository;
   @Mock private UserRepository userRepository;
+  @Mock private PlanLimitService planLimitService;
 
   @InjectMocks private BillingService billingService;
 

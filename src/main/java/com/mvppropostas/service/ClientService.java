@@ -27,6 +27,7 @@ public class ClientService {
   private final ClientRepository clientRepository;
   private final ProposalRepository proposalRepository;
   private final CurrentUserProvider currentUserProvider;
+  private final PlanLimitService planLimitService;
 
   @Transactional(readOnly = true)
   public List<ClientResponse> list() {
@@ -48,6 +49,7 @@ public class ClientService {
 
   @Transactional
   public ClientResponse create(ClientRequest request) {
+    planLimitService.assertCanCreateClient();
     LocalDateTime now = LocalDateTime.now();
     Client client = new Client();
     client.setId(UUID.randomUUID());

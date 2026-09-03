@@ -34,6 +34,7 @@ public class ProposalService {
   private final ProposalRepository proposalRepository;
   private final ClientRepository clientRepository;
   private final CurrentUserProvider currentUserProvider;
+  private final PlanLimitService planLimitService;
 
   @Transactional(readOnly = true)
   public List<ProposalResponse> list(UUID clientId) {
@@ -52,6 +53,7 @@ public class ProposalService {
 
   @Transactional
   public ProposalResponse create(ProposalRequest request) {
+    planLimitService.assertCanCreateProposal();
     UUID userId = currentUserProvider.getCurrentUserId();
     Client client = requireOwnedClient(request.clientId(), userId);
     LocalDateTime now = LocalDateTime.now();
@@ -106,6 +108,7 @@ public class ProposalService {
 
   @Transactional
   public ProposalResponse duplicate(UUID id) {
+    planLimitService.assertCanCreateProposal();
     Proposal source = requireProposal(id);
     LocalDateTime now = LocalDateTime.now();
 

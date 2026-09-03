@@ -39,6 +39,7 @@ public class BillingService {
   private final MercadoPagoClient mercadoPagoClient;
   private final SubscriptionRepository subscriptionRepository;
   private final UserRepository userRepository;
+  private final PlanLimitService planLimitService;
 
   @Transactional(readOnly = true)
   public BillingStatusResponse getStatus() {
@@ -55,7 +56,8 @@ public class BillingService {
         properties.isSandbox(),
         isSandboxTestMode(),
         MercadoPagoProperties.PRO_AMOUNT,
-        MercadoPagoProperties.PRO_CURRENCY);
+        MercadoPagoProperties.PRO_CURRENCY,
+        planLimitService.currentUsage());
   }
 
   @Transactional

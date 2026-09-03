@@ -11,4 +11,5 @@ public record BillingStatusResponse(
     boolean sandbox,
     boolean sandboxTestMode,
     BigDecimal amount,
-    String currency) {}
+    String currency,
+    PlanUsageResponse usage) {}

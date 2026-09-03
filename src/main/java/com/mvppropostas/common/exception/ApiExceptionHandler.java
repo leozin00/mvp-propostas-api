@@ -58,6 +58,18 @@ public class ApiExceptionHandler {
                 "message", exception.getMessage()));
   }
 
+  @ExceptionHandler(PlanLimitException.class)
+  ResponseEntity<Map<String, Object>> handlePlanLimit(PlanLimitException exception) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(
+            Map.of(
+                "timestamp", Instant.now().toString(),
+                "status", HttpStatus.FORBIDDEN.value(),
+                "error", "Plan Limit",
+                "code", exception.getCode(),
+                "message", exception.getMessage()));
+  }
+
   @ExceptionHandler(BusinessException.class)
   ResponseEntity<Map<String, Object>> handleBusiness(BusinessException exception) {
     return ResponseEntity.badRequest()
