@@ -20,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserProvisioningService {
 
+  private static final int LAST_LOGIN_TOUCH_MINUTES = 15;
+
   private final UserRepository userRepository;
 
   @Transactional
@@ -37,6 +39,7 @@ public class UserProvisioningService {
       if (!user.isActive()) {
         throw new AccessDeniedException("Esta conta está desativada.");
       }
+      touchLastLogin(user);
       return user;
     } catch (DataIntegrityViolationException exception) {
       return userRepository
@@ -74,7 +77,19 @@ public class UserProvisioningService {
     user.setActive(true);
     user.setCreatedAt(now);
     user.setUpdatedAt(now);
+    user.setLastLogin(now);
     return userRepository.save(user);
+  }
+
+  private void touchLastLogin(User user) {
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime lastLogin = user.getLastLogin();
+    if (lastLogin != null && !lastLogin.isBefore(now.minusMinutes(LAST_LOGIN_TOUCH_MINUTES))) {
+      return;
+    }
+    user.setLastLogin(now);
+    user.setUpdatedAt(now);
+    userRepository.save(user);
   }
 
   private static String requiredEmail(Jwt jwt) {

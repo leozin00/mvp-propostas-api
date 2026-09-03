@@ -88,6 +88,21 @@ public class MercadoPagoClient {
     }
   }
 
+  public void cancelPreapproval(String id) {
+    try {
+      restClient()
+          .put()
+          .uri("/preapproval/{id}", id)
+          .body(Map.of("status", "cancelled"))
+          .retrieve()
+          .toBodilessEntity();
+    } catch (RestClientResponseException exception) {
+      log.warn("Mercado Pago rejeitou cancelamento da assinatura {}: {}", id, exception.getResponseBodyAsString());
+      throw new BusinessException(
+          "Não foi possível cancelar a assinatura no Mercado Pago. " + extractMessage(exception));
+    }
+  }
+
   public MpAuthorizedPaymentResponse getAuthorizedPayment(String id) {
     try {
       return restClient()

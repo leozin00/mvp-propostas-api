@@ -14,7 +14,11 @@ import com.mvppropostas.domain.enums.ProposalStatus;
 
 public interface ProposalRepository extends JpaRepository<Proposal, UUID> {
 
+  long countByDeletedAtIsNull();
+
   long countByUserIdAndDeletedAtIsNull(UUID userId);
+
+  long countByUserIdAndCreatedAtGreaterThanEqual(UUID userId, java.time.LocalDateTime createdAt);
 
   long countByUserIdAndStatusInAndDeletedAtIsNull(UUID userId, List<ProposalStatus> statuses);
 

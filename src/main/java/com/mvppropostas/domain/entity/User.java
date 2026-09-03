@@ -55,4 +55,7 @@ public class User {
 
   @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
+
+  @Column(name = "last_login")
+  private LocalDateTime lastLogin;
 }
