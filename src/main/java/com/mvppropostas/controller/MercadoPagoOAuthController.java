@@ -2,6 +2,7 @@ package com.mvppropostas.controller;
 
 import java.io.IOException;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/dev/mercadopago/oauth")
+@ConditionalOnProperty(name = "app.debug.mercadopago-oauth-enabled", havingValue = "true")
 @RequiredArgsConstructor
 public class MercadoPagoOAuthController {
 

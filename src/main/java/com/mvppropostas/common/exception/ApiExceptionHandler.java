@@ -58,6 +58,18 @@ public class ApiExceptionHandler {
                 "message", exception.getMessage()));
   }
 
+  @ExceptionHandler(EmailNotVerifiedException.class)
+  ResponseEntity<Map<String, Object>> handleEmailNotVerified(EmailNotVerifiedException exception) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(
+            Map.of(
+                "timestamp", Instant.now().toString(),
+                "status", HttpStatus.FORBIDDEN.value(),
+                "error", "Forbidden",
+                "code", EmailNotVerifiedException.CODE,
+                "message", exception.getMessage()));
+  }
+
   @ExceptionHandler(PlanLimitException.class)
   ResponseEntity<Map<String, Object>> handlePlanLimit(PlanLimitException exception) {
     return ResponseEntity.status(HttpStatus.FORBIDDEN)

@@ -1,5 +1,8 @@
 package com.mvppropostas.controller;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +24,15 @@ public class PublicProposalController {
   @GetMapping("/{token}")
   PublicProposalResponse getByToken(@PathVariable String token) {
     return publicProposalService.getByToken(token);
+  }
+
+  @GetMapping(value = "/{token}/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+  ResponseEntity<byte[]> downloadPdf(@PathVariable String token) {
+    byte[] pdf = publicProposalService.exportPdf(token);
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"proposta.pdf\"")
+        .contentType(MediaType.APPLICATION_PDF)
+        .body(pdf);
   }
 
   @PostMapping("/{token}/approve")

@@ -1,0 +1,18 @@
+# Cloud Run / produção. Ativar com SPRING_PROFILES_ACTIVE=prod
+app:
+  keep-demo-seed: false
+  auth:
+    require-email-verified: true
+  debug:
+    sentry-test-enabled: false
+    mercadopago-oauth-enabled: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+sentry:
+  environment: production
+  traces-sample-rate: 0.2

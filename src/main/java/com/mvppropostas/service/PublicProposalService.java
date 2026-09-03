@@ -26,6 +26,7 @@ public class PublicProposalService {
 
   private final ProposalRepository proposalRepository;
   private final UserRepository userRepository;
+  private final ProposalPdfService proposalPdfService;
 
   @Transactional
   public PublicProposalResponse getByToken(String token) {
@@ -33,6 +34,14 @@ public class PublicProposalService {
     expireIfNeeded(proposal);
     markViewedIfSent(proposal);
     return toResponse(proposal, requireIssuer(proposal));
+  }
+
+  @Transactional
+  public byte[] exportPdf(String token) {
+    Proposal proposal = requirePublished(token);
+    expireIfNeeded(proposal);
+    markViewedIfSent(proposal);
+    return proposalPdfService.render(proposal, requireIssuer(proposal));
   }
 
   @Transactional

@@ -35,6 +35,7 @@ public class ProposalService {
   private final ClientRepository clientRepository;
   private final CurrentUserProvider currentUserProvider;
   private final PlanLimitService planLimitService;
+  private final ProposalPdfService proposalPdfService;
 
   @Transactional(readOnly = true)
   public List<ProposalResponse> list(UUID clientId) {
@@ -49,6 +50,11 @@ public class ProposalService {
   @Transactional(readOnly = true)
   public ProposalResponse getById(UUID id) {
     return toResponse(requireProposal(id), true);
+  }
+
+  @Transactional(readOnly = true)
+  public byte[] exportPdf(UUID id) {
+    return proposalPdfService.render(requireProposal(id), currentUserProvider.getCurrentUser());
   }
 
   @Transactional

@@ -2,8 +2,11 @@ package com.mvppropostas.security;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.springframework.http.MediaType;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +33,11 @@ class FirebaseAuthTest {
   }
 
   @Test
-  void publicProposalDoesNotRequireAuthentication() throws Exception {
+  void publicProposalPdfDoesNotRequireAuthentication() throws Exception {
     mockMvc
-        .perform(get("/api/v1/public/proposals/demo-aurora"))
+        .perform(get("/api/v1/public/proposals/demo-aurora/pdf"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.title").value("Projeto de identidade visual"));
+        .andExpect(content().contentType(MediaType.APPLICATION_PDF));
   }
 
   @Test

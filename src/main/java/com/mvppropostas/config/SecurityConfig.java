@@ -7,8 +7,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.mvppropostas.security.EmailVerifiedFilter;
 import com.mvppropostas.security.JsonAccessDeniedHandler;
 import com.mvppropostas.security.JsonAuthenticationEntryPoint;
 
@@ -21,6 +23,7 @@ public class SecurityConfig {
 
   private final JsonAuthenticationEntryPoint authenticationEntryPoint;
   private final JsonAccessDeniedHandler accessDeniedHandler;
+  private final EmailVerifiedFilter emailVerifiedFilter;
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -55,6 +58,8 @@ public class SecurityConfig {
                 oauth2
                     .authenticationEntryPoint(authenticationEntryPoint)
                     .jwt(Customizer.withDefaults()));
+
+    http.addFilterAfter(emailVerifiedFilter, BearerTokenAuthenticationFilter.class);
 
     return http.build();
   }

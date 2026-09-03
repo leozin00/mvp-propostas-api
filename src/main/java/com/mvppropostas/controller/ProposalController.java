@@ -3,7 +3,10 @@ package com.mvppropostas.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +40,15 @@ public class ProposalController {
   @GetMapping("/{id}")
   ProposalResponse getById(@PathVariable UUID id) {
     return proposalService.getById(id);
+  }
+
+  @GetMapping(value = "/{id}/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+  ResponseEntity<byte[]> downloadPdf(@PathVariable UUID id) {
+    byte[] pdf = proposalService.exportPdf(id);
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"proposta.pdf\"")
+        .contentType(MediaType.APPLICATION_PDF)
+        .body(pdf);
   }
 
   @PostMapping

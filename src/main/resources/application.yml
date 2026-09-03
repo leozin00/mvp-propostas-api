@@ -36,13 +36,19 @@ management:
 
 app:
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://127.0.0.1:4200,http://localhost:4400,http://127.0.0.1:4400}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://127.0.0.1:4200,http://localhost:4300,http://127.0.0.1:4300,http://localhost:4400,http://127.0.0.1:4400}
   admin:
     emails: ${ADMIN_EMAILS:}
   firebase:
     project-id: ${FIREBASE_PROJECT_ID:gestao-propostas-mvp}
+  auth:
+    require-email-verified: ${APP_REQUIRE_EMAIL_VERIFIED:true}
+  keep-demo-seed: ${KEEP_DEMO_SEED:true}
+  rate-limit:
+    public-per-minute: ${PUBLIC_RATE_LIMIT_PER_MINUTE:60}
   debug:
-    sentry-test-enabled: ${APP_DEBUG_SENTRY_TEST_ENABLED:true}
+    sentry-test-enabled: ${APP_DEBUG_SENTRY_TEST_ENABLED:false}
+    mercadopago-oauth-enabled: ${APP_DEBUG_MP_OAUTH_ENABLED:false}
   mercadopago:
     access-token: ${MERCADOPAGO_ACCESS_TOKEN:}
     sandbox-access-token: ${MERCADOPAGO_SANDBOX_ACCESS_TOKEN:}
@@ -69,6 +75,8 @@ sentry:
 
 springdoc:
   api-docs:
+    enabled: ${SPRINGDOC_ENABLED:true}
     path: /v3/api-docs
   swagger-ui:
+    enabled: ${SPRINGDOC_ENABLED:true}
     path: /swagger-ui

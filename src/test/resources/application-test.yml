@@ -18,11 +18,19 @@ spring:
 
 app:
   cors:
-    allowed-origins: http://localhost:4200,http://127.0.0.1:4200,http://localhost:4400,http://127.0.0.1:4400
+    allowed-origins: http://localhost:4200,http://127.0.0.1:4200,http://localhost:4300,http://127.0.0.1:4300,http://localhost:4400,http://127.0.0.1:4400
   admin:
     emails: admin@test.com
   firebase:
     project-id: test-project
+  auth:
+    require-email-verified: false
+  keep-demo-seed: true
+  rate-limit:
+    public-per-minute: 1000
+  debug:
+    sentry-test-enabled: false
+    mercadopago-oauth-enabled: false
   mercadopago:
     access-token: test-access-token
     sandbox-access-token: ""

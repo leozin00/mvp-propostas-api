@@ -1,8 +1,10 @@
-# MVP Propostas — Backend
+# Gestão de Propostas — API
 
 API REST em **Spring Boot 4** + **Java 21** + **PostgreSQL** + **Flyway**.
 
-> Por enquanto o backend vive neste monorepo (`mvp-propostas/backend`). Futuramente será extraído para um repositório dedicado.
+Fonte de verdade do produto: `docs/` e `AGENTS.md` (neste monorepo; após o split, neste mesmo repo `mvp-propostas-api`).
+
+Homologação e produção: `docs/deploy.md`. Seed demo só permanece com `KEEP_DEMO_SEED=true` (local).
 
 ## Stack
 
@@ -54,11 +56,14 @@ Copie `.env.example` (na raiz do monorepo) e ajuste se necessário. Valores padr
 | `DB_USERNAME` | `mvp` |
 | `DB_PASSWORD` | `mvp` |
 | `SERVER_PORT` | `8080` |
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:4200` |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:4200` (incluir LP `:4300` e admin `:4400`) |
 | `SENTRY_DSN` | DSN do projeto `mvp-propostas-api` no Sentry |
 | `SENTRY_ENVIRONMENT` | `development` |
 | `SENTRY_TRACES_SAMPLE_RATE` | `1.0` |
-| `APP_DEBUG_SENTRY_TEST_ENABLED` | `true` — habilita `GET /api/v1/debug/sentry` para testar integração |
+| `KEEP_DEMO_SEED` | `true` local; `false` em staging/prod |
+| `APP_REQUIRE_EMAIL_VERIFIED` | `true` |
+| `APP_DEBUG_SENTRY_TEST_ENABLED` | `false` — `true` só habilita `GET /api/v1/debug/sentry` |
+| `APP_DEBUG_MP_OAUTH_ENABLED` | `false` — `true` só local para OAuth sandbox |
 
 > O Spring Boot carrega automaticamente o arquivo `.env` da raiz do monorepo (ou `backend/.env`).
 
