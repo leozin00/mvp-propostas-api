@@ -2,7 +2,9 @@
 
 API REST em **Spring Boot 4** + **Java 21** + **PostgreSQL** + **Flyway**.
 
-Fonte de verdade do produto: `docs/` e `AGENTS.md` (neste monorepo; após o split, neste mesmo repo `mvp-propostas-api`).
+Fonte de verdade do produto: `docs/` e `AGENTS.md` neste repositório (`mvp-propostas-api`).
+
+Os quatro apps ficam lado a lado na pasta local `mvp-propostas/` (`api`, `app`, `lp`, `admin`) para o Cursor ter o contexto completo.
 
 Homologação e produção: `docs/deploy.md`. Seed demo só permanece com `KEEP_DEMO_SEED=true` (local).
 
@@ -25,7 +27,7 @@ Homologação e produção: `docs/deploy.md`. Seed demo só permanece com `KEEP_
 
 ## Subir o banco
 
-Na raiz do monorepo:
+Na pasta desta API:
 
 ```bash
 docker compose up -d
@@ -34,7 +36,6 @@ docker compose up -d
 ## Rodar a API
 
 ```bash
-cd backend
 ./mvnw spring-boot:run
 ```
 
@@ -48,7 +49,7 @@ Endpoints úteis:
 
 ## Variáveis de ambiente
 
-Copie `.env.example` (na raiz do monorepo) e ajuste se necessário. Valores padrão em `application.yml`:
+Copie `.env.example` para `.env` nesta pasta e ajuste se necessário. Valores padrão em `application.yml`:
 
 | Variável | Default |
 |----------|---------|
@@ -65,7 +66,7 @@ Copie `.env.example` (na raiz do monorepo) e ajuste se necessário. Valores padr
 | `APP_DEBUG_SENTRY_TEST_ENABLED` | `false` — `true` só habilita `GET /api/v1/debug/sentry` |
 | `APP_DEBUG_MP_OAUTH_ENABLED` | `false` — `true` só local para OAuth sandbox |
 
-> O Spring Boot carrega automaticamente o arquivo `.env` da raiz do monorepo (ou `backend/.env`).
+> O Spring Boot carrega automaticamente o `.env` desta pasta.
 
 ### Erros no frontend vs backend
 
