@@ -11,55 +11,92 @@ on:
         options: [staging, production]
         default: staging
 
+concurrency:
+  group: deploy-api-${{ github.event.inputs.environment || 'staging' }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
-    if: ${{ vars.GCP_PROJECT_ID != '' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     environment: ${{ github.event.inputs.environment || 'staging' }}
     permissions:
       contents: read
       id-token: write
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ vars.GCP_REGION }}
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      GCP_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT }}
+      CLOUD_RUN_SERVICE: ${{ vars.CLOUD_RUN_SERVICE }}
+      SPRING_PROFILE: ${{ vars.SPRING_PROFILE }}
+      API_PUBLIC_URL: ${{ vars.API_PUBLIC_URL }}
     steps:
+      - name: Check environment variables
+        run: |
+          missing=0
+          for v in GCP_PROJECT_ID GCP_REGION GCP_WORKLOAD_IDENTITY_PROVIDER GCP_SERVICE_ACCOUNT CLOUD_RUN_SERVICE SPRING_PROFILE API_PUBLIC_URL; do
+            if [ -z "${!v}" ]; then
+              echo "Missing GitHub Environment var: $v"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "Configure the ${{ github.event.inputs.environment || 'staging' }} environment on this repo (see docs/deploy.md)."
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
           cache: maven
+
       - run: ./mvnw -q -DskipTests package
+
       - uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.GCP_SERVICE_ACCOUNT }}
+
       - uses: google-github-actions/setup-gcloud@v2
+
       - name: Build and push image
         run: |
-          IMAGE="${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/mvp-propostas/api:${{ github.sha }}"
-          gcloud auth configure-docker "${{ vars.GCP_REGION }}-docker.pkg.dev" --quiet
-          docker build -t "$IMAGE" .
+          IMAGE="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/mvp-propostas/api:${GITHUB_SHA}"
+          gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
+          docker build --platform linux/amd64 -t "$IMAGE" .
           docker push "$IMAGE"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
       - uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: ${{ vars.CLOUD_RUN_SERVICE }}
-          region: ${{ vars.GCP_REGION }}
+          service: ${{ env.CLOUD_RUN_SERVICE }}
+          region: ${{ env.GCP_REGION }}
           image: ${{ env.IMAGE }}
           flags: >-
             --memory=512Mi
             --cpu=1
+            --cpu-boost
             --min-instances=0
             --max-instances=3
             --port=8080
-            --allow-unauthenticated
-            --update-env-vars=SPRING_PROFILES_ACTIVE=${{ vars.SPRING_PROFILE }}
+            --update-env-vars=SPRING_PROFILES_ACTIVE=${{ env.SPRING_PROFILE }}
+            --startup-probe=httpGet.path=/api/v1/health,httpGet.port=8080,periodSeconds=10,timeoutSeconds=5,failureThreshold=12
+
       - name: Health check
         run: |
-          URL="${{ vars.API_PUBLIC_URL }}/api/v1/health"
-          for i in 1 2 3 4 5 6; do
+          URL="${API_PUBLIC_URL%/}/api/v1/health"
+          echo "GET $URL"
+          for i in $(seq 1 18); do
             if curl -fsS "$URL"; then
+              echo
               exit 0
             fi
+            echo "attempt $i failed; waiting 10s (cold start)"
             sleep 10
           done
-          echo "Health check falhou: $URL"
+          echo "Health check failed: $URL"
           exit 1
