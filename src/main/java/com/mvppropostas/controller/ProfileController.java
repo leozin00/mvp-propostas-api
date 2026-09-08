@@ -1,9 +1,12 @@
 package com.mvppropostas.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mvppropostas.dto.request.ProfileBusinessRequest;
@@ -34,5 +37,11 @@ public class ProfileController {
   @PutMapping("/business")
   UserProfileResponse updateBusiness(@Valid @RequestBody ProfileBusinessRequest request) {
     return profileService.updateBusiness(request);
+  }
+
+  @DeleteMapping
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  void deleteAccount() {
+    profileService.deleteAccount();
   }
 }

@@ -1,7 +1,9 @@
 package com.mvppropostas.service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ public class ProfileService {
 
   private final CurrentUserProvider currentUserProvider;
   private final UserRepository userRepository;
+  private final JdbcTemplate jdbcTemplate;
 
   @Transactional(readOnly = true)
   public UserProfileResponse getProfile() {
@@ -55,6 +58,20 @@ public class ProfileService {
     user.setContactPhone(blankToNull(request.contactPhone()));
     user.setUpdatedAt(LocalDateTime.now());
     return toResponse(userRepository.save(user));
+  }
+
+  @Transactional
+  public void deleteAccount() {
+    User user = currentUserProvider.getCurrentUser();
+    UUID userId = user.getId();
+    jdbcTemplate.update(
+        "DELETE FROM proposal_items WHERE proposal_id IN (SELECT id FROM proposals WHERE user_id = ?)",
+        userId);
+    jdbcTemplate.update("DELETE FROM proposals WHERE user_id = ?", userId);
+    jdbcTemplate.update("DELETE FROM clients WHERE user_id = ?", userId);
+    jdbcTemplate.update("DELETE FROM subscriptions WHERE user_id = ?", userId);
+    userRepository.delete(user);
+    userRepository.flush();
   }
 
   private UserProfileResponse toResponse(User user) {

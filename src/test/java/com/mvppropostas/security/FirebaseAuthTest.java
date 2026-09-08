@@ -1,6 +1,7 @@
 package com.mvppropostas.security;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -85,5 +86,39 @@ class FirebaseAuthTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value("11111111-1111-1111-1111-111111111111"))
         .andExpect(jsonPath("$.email").value("leonardo@empresa.com"));
+  }
+
+  @Test
+  void deleteAccountRemovesProvisionedUser() throws Exception {
+    mockMvc
+        .perform(
+            get("/api/v1/profile")
+                .with(
+                    jwt()
+                        .jwt(
+                            token ->
+                                token
+                                    .subject("firebase-delete-user")
+                                    .claim("email", "delete-me@empresa.com")
+                                    .claim("name", "Conta a excluir"))))
+        .andExpect(status().isOk());
+
+    org.assertj.core.api.Assertions.assertThat(userRepository.findByFirebaseUid("firebase-delete-user"))
+        .isPresent();
+
+    mockMvc
+        .perform(
+            delete("/api/v1/profile")
+                .with(
+                    jwt()
+                        .jwt(
+                            token ->
+                                token
+                                    .subject("firebase-delete-user")
+                                    .claim("email", "delete-me@empresa.com"))))
+        .andExpect(status().isNoContent());
+
+    org.assertj.core.api.Assertions.assertThat(userRepository.findByFirebaseUid("firebase-delete-user"))
+        .isEmpty();
   }
 }
