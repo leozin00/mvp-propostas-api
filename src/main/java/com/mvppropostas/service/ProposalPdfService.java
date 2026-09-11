@@ -92,7 +92,7 @@ public class ProposalPdfService {
       document.add(gap());
       document.add(
           new Paragraph(
-              "Documento gerado pelo Gestão de Propostas. Neste plano o PDF não inclui logo da empresa.",
+              "Documento gerado pelo Dobrio. Neste plano o PDF não inclui logo da empresa.",
               small));
 
       document.close();
